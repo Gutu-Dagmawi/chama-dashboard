@@ -1,32 +1,637 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
+  <meta name="description" content="Chama Admin - Modern Enterprise Dashboard">
+  <meta name="author" content="Chama Team">
+  <title>Chama Admin | Enterprise Dashboard</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/000000/dashboard.png">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dropdown-styles.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f4f6fb 0%, #e9edf5 100%);
+      min-height: 100vh;
+    }
+    .sidebar {
+      min-width: 240px;
+      box-shadow: 2px 0 12px rgba(0,0,0,0.04);
+      background: #1a1d23;
+    }
+    .sidebar .nav-link.active, .sidebar .nav-link:hover {
+      background: #23272f;
+      color: #fff;
+      border-radius: 8px;
+    }
+    .sidebar .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1rem;
+      border: 2px solid #fff;
+    }
+    .main {
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .topbar {
+      background: #fff;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .card {
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+    .form-section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #495057;
+    }
+    .form-label {
+      font-weight: 500;
+    }
+    .variant-row {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 0.5rem 0.5rem 0.5rem 0;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+    .btn-remove-variant {
+      margin-top: 1.7rem;
+    }
+    .table thead th {
+      background: #f1f3f7;
+      font-weight: 600;
+      color: #495057;
+      border-bottom: 2px solid #dee2e6;
+    }
+    .table tbody tr {
+      vertical-align: middle;
+    }
+    .action-btns .btn {
+      margin-right: 0.25rem;
+    }
+    .nav-link {
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-  <div class="sidebar" id="sidebar">
-    <h2>Admin</h2>
-    <ul>
-      <li><a href="#">Dashboard</a></li>
-      <li><a href="#">Products</a></li>
-      <li><a href="#">Variants</a></li>
-    </ul>
+  <div id="sidebarWrapper">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Admin" class="avatar">
+        <h4 class="mb-0 mt-2">John Doe</h4>
+        <small class="text-muted">Administrator</small>
+      </div>
+      
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" id="nav-products">
+            <i class="bi bi-box-seam"></i>
+            <span>Products</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="nav-variants">
+            <i class="bi bi-grid-3x3-gap"></i>
+            <span>Variants</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="nav-orders">
+            <i class="bi bi-cart3"></i>
+            <span>Orders</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="nav-customers">
+            <i class="bi bi-people"></i>
+            <span>Customers</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="nav-reports">
+            <i class="bi bi-graph-up"></i>
+            <span>Reports</span>
+          </a>
+        </li>
+      </ul>
+      
+      <div class="sidebar-footer">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="bi bi-gear"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Logout</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
   </div>
 
+  <!-- Main Content -->
   <div class="main">
-    <div class="topbar">
-      <button id="toggleBtn">☰</button>
-      <h1>Dashboard</h1>
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-link nav-icon me-2" id="toggleBtn">
+          <i class="bi bi-list"></i>
+        </button>
+        
+        <div class="search-bar">
+          <i class="bi bi-search"></i>
+          <input type="text" class="form-control" placeholder="Search...">
+        </div>
+        <h1 class="h4 mb-0 ms-3" id="main-title">Products</h1>
+      </div>
+      
+      <div class="d-flex align-items-center">
+        <!-- Notifications Dropdown -->
+        <div class="dropdown">
+          <a href="#" class="nav-link position-relative" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bell nav-icon"></i>
+            <span class="badge">3</span>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end">
+            <h6 class="dropdown-header">Notifications</h6>
+            <a class="dropdown-item" href="#">
+              <i class="bi bi-cart-check"></i>
+              New order received
+              <small class="text-muted d-block mt-1">2 minutes ago</small>
+            </a>
+            <a class="dropdown-item" href="#">
+              <i class="bi bi-person-plus"></i>
+              New user registered
+              <small class="text-muted d-block mt-1">1 hour ago</small>
+            </a>
+            <a class="dropdown-item" href="#">
+              <i class="bi bi-chat-square-text"></i>
+              New message from support
+              <small class="text-muted d-block mt-1">3 hours ago</small>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="#" class="dropdown-item text-center text-primary">View all notifications</a>
+          </div>
+        </div>
+        
+        <!-- User Dropdown -->
+        <div class="dropdown ms-2">
+          <a href="#" class="user-profile" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Admin" class="avatar">
+            <div class="user-info d-none d-md-block">
+              <div class="user-name">John Doe</div>
+              <div class="user-role">Administrator</div>
+            </div>
+            <i class="bi bi-chevron-down ms-1 d-none d-md-block"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i>Profile</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i>Settings</a></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-question-circle"></i>Help Center</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <div class="content p-4">
+        <!-- Products Table View -->
+        <div id="productsTableView">
+          <div class="table-container">
+            <div class="table-header">
+              <h2 class="table-title">Product Inventory</h2>
+              <div class="table-actions">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="bi bi-funnel me-1"></i> Filters
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><h6 class="dropdown-header">Status</h6></li>
+                      <li><a class="dropdown-item" href="#">Active</a></li>
+                      <li><a class="dropdown-item" href="#">Inactive</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><h6 class="dropdown-header">Stock</h6></li>
+                      <li><a class="dropdown-item" href="#">In Stock</a></li>
+                      <li><a class="dropdown-item" href="#">Low Stock</a></li>
+                      <li><a class="dropdown-item" href="#">Out of Stock</a></li>
+                    </ul>
+                  </div>
+                  <div class="input-group" style="max-width: 300px;">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search products...">
+                  </div>
+                  <button class="btn btn-primary" id="addProductBtn">
+                    <i class="bi bi-plus-lg me-1"></i> Add Product
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th style="width: 25%;">PRODUCT</th>
+                    <th style="width: 15%;">BRAND</th>
+                    <th style="width: 15%;">CATEGORY</th>
+                    <th style="width: 15%;" class="text-end">PRICE</th>
+                    <th style="width: 15%;" class="text-center">STOCK</th>
+                    <th style="width: 10%;">STATUS</th>
+                    <th style="width: 5%;" class="text-end"></th>
+                  </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                  <!-- Example row 1 -->
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Nike Air Force" class="product-img">
+                        <div class="product-info">
+                          <div class="product-name">Nike Air Force 1</div>
+                          <div class="product-sku">#NIK-001</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Nike</td>
+                    <td>Sneakers</td>
+                    <td class="text-end fw-medium">$129.99</td>
+                    <td class="text-center">
+                      <div class="stock-status stock-in-stock">
+                        <span class="indicator"></span>
+                        <span>In Stock</span>
+                      </div>
+                    </td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                    <td class="text-end">
+                      <div class="dropdown action-dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i>View Details</a></li>
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i>Edit</a></li>
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-up-right"></i>View on Store</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i>Delete</a></li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                  
+                  <!-- Example row 2 -->
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Adidas Ultraboost" class="product-img">
+                        <div class="product-info">
+                          <div class="product-name">Adidas Ultraboost 21</div>
+                          <div class="product-sku">#ADI-045</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Adidas</td>
+                    <td>Running</td>
+                    <td class="text-end fw-medium">$179.99</td>
+                    <td class="text-center">
+                      <div class="stock-status stock-low">
+                        <span class="indicator"></span>
+                        <span>3 left</span>
+                      </div>
+                    </td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                    <td class="text-end">
+                      <div class="dropdown action-dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i>View Details</a></li>
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i>Edit</a></li>
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-up-right"></i>View on Store</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i>Delete</a></li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                  
+                  <!-- Example row 3 -->
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        <img src="https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Puma RS-X" class="product-img">
+                        <div class="product-info">
+                          <div class="product-name">Puma RS-X Reinvention</div>
+                          <div class="product-sku">#PUM-112</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>Puma</td>
+                    <td>Lifestyle</td>
+                    <td class="text-end fw-medium">$110.00</td>
+                    <td class="text-center">
+                      <div class="stock-status stock-out">
+                        <span class="indicator"></span>
+                        <span>Out of Stock</span>
+                      </div>
+                    </td>
+                    <td><span class="status-badge status-inactive">Inactive</span></td>
+                    <td class="text-end">
+                      <div class="dropdown action-dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i>View Details</a></li>
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i>Edit</a></li>
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-up-right"></i>View on Store</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i>Delete</a></li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination-container">
+              <div class="pagination-info">
+                Showing <strong>1</strong> to <strong>3</strong> of <strong>24</strong> products
+              </div>
+              <nav aria-label="Products pagination">
+                <ul class="pagination mb-0">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+        <!-- Variants Table View (hidden by default, now outside products content) -->
+        <div id="variantsTableView" style="display:none;">
+          <div class="table-container">
+            <div class="table-header">
+              <h2 class="table-title">Variant Inventory</h2>
+              <div class="table-actions">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="bi bi-funnel me-1"></i> Filters
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><h6 class="dropdown-header">Status</h6></li>
+                      <li><a class="dropdown-item" href="#">Active</a></li>
+                      <li><a class="dropdown-item" href="#">Inactive</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><h6 class="dropdown-header">Stock</h6></li>
+                      <li><a class="dropdown-item" href="#">In Stock</a></li>
+                      <li><a class="dropdown-item" href="#">Low Stock</a></li>
+                      <li><a class="dropdown-item" href="#">Out of Stock</a></li>
+                    </ul>
+                  </div>
+                  <div class="input-group" style="max-width: 300px;">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search variants...">
+                  </div>
+                  <button class="btn btn-primary" id="addVariantDirectBtn">
+                    <i class="bi bi-plus-lg me-1"></i> Add Variant
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th style="width: 25%;">SKU</th>
+                    <th style="width: 15%;">COLOR</th>
+                    <th style="width: 15%;">SIZE</th>
+                    <th style="width: 15%;" class="text-center">STOCK</th>
+                    <th style="width: 15%;">STATUS</th>
+                    <th style="width: 15%;" class="text-end"></th>
+                  </tr>
+                </thead>
+                <tbody id="variantsTableBody">
+                  <!-- Example row 1 -->
+                  <tr>
+                    <td>SKU-001</td>
+                    <td><span style="display:inline-block;width:24px;height:24px;background:#000;border-radius:4px;"></span> Black</td>
+                    <td>42</td>
+                    <td class="text-center">
+                      <div class="stock-status stock-in-stock">
+                        <span class="indicator"></span>
+                        <span>In Stock</span>
+                      </div>
+                    </td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                    <td class="text-end">
+                      <div class="dropdown action-dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i>View Details</a></li>
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i>Edit</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i>Delete</a></li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- Example row 2 -->
+                  <tr>
+                    <td>SKU-002</td>
+                    <td><span style="display:inline-block;width:24px;height:24px;background:#f00;border-radius:4px;"></span> Red</td>
+                    <td>40</td>
+                    <td class="text-center">
+                      <div class="stock-status stock-low">
+                        <span class="indicator"></span>
+                        <span>3 left</span>
+                      </div>
+                    </td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                    <td class="text-end">
+                      <div class="dropdown action-dropdown">
+                        <button class="btn btn-link" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i>View Details</a></li>
+                          <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i>Edit</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i>Delete</a></li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- Pagination -->
+            <div class="pagination-container">
+              <div class="pagination-info">
+                Showing <strong>1</strong> to <strong>2</strong> of <strong>10</strong> variants
+              </div>
+              <nav aria-label="Variants pagination">
+                <ul class="pagination mb-0">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="content">
-      <h2>Welcome</h2>
-      <p>This is a starter admin dashboard.</p>
+    <!-- Add Product Form View (hidden by default) -->
+    <div id="addProductView" style="display:none;">
+      <div class="card p-3" style="margin-top: 7rem;">
+        <form id="productForm" enctype="multipart/form-data">
+          <div class="mb-4">
+            <div class="form-section-title">Product Details</div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="product[name]" required placeholder="e.g. Nike Air Force">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Base Price</label>
+                <input type="number" step="0.01" class="form-control" name="product[base_price]" required placeholder="e.g. 199.99">
+              </div>
+              <div class="col-md-8">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" name="product[description]" placeholder="A great nike sneaker">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Brand</label>
+                <input type="text" class="form-control" name="product[brand]" placeholder="e.g. Nike">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Gender</label>
+                <select class="form-select" name="product[gender]">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="unisex">Unisex</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Category ID</label>
+                <input type="number" class="form-control" name="product[category_id]" placeholder="e.g. 1">
+              </div>
+            </div>
+          </div>
+          <hr>
+          <div class="mb-3">
+            <div class="form-section-title">Variants</div>
+            <div id="variantsContainer"></div>
+            <button type="button" class="btn btn-outline-primary my-2" id="addVariantBtn"><i class="bi bi-plus-circle"></i> Add Variant</button>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success btn-lg px-4"><i class="bi bi-check-circle me-2"></i>Submit Product</button>
+            <button type="button" class="btn btn-outline-secondary btn-lg ms-2" id="cancelAddProductBtn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Product Detail View (hidden by default, now just below topbar) -->
+    <div id="productDetailView" style="display:none;">
+      <div class="card product-detail-card mx-auto p-4" style="max-width:950px;margin-top:5.5rem;background:#f9fafb;border:1px solid #e5e7eb;box-shadow:0 6px 32px rgba(0,0,0,0.08);border-radius:1.5rem;">
+        <button class="btn btn-link mb-3" id="backToProductsBtn"><i class="bi bi-arrow-left"></i> Back to Products</button>
+        <div class="row g-4 align-items-start">
+          <div class="col-md-5 text-center">
+            <div class="bg-white p-3 rounded-4 shadow-sm d-inline-block" style="border:1px solid #e5e7eb;">
+              <img id="detailProductImg" src="" alt="Product Image" class="rounded-3 mb-2" style="width:100%;max-width:320px;height:320px;object-fit:cover;box-shadow:0 2px 16px rgba(0,0,0,0.10);border:1px solid #f3f4f6;">
+            </div>
+          </div>
+          <div class="col-md-7">
+            <h2 id="detailProductName" class="mb-2 fw-bold"></h2>
+            <div class="mb-2"><span id="detailProductBrand" class="text-muted"></span></div>
+            <span id="detailProductStatus" class="status-badge mb-2"></span>
+            <div class="mb-2 small text-muted"><strong>Category:</strong> <span id="detailProductCategory"></span></div>
+            <div class="mb-2 fs-5"><strong>Price:</strong> <span id="detailProductPrice"></span></div>
+            <div class="mb-2"><strong>Stock:</strong> <span id="detailProductStock"></span></div>
+            <div class="mb-3"><strong>Description:</strong> <div id="detailProductDescription" class="text-muted small"></div></div>
+            <div class="mb-2 fw-semibold">Variants</div>
+            <div id="detailVariantsSelector" class="d-flex flex-wrap gap-3 mb-3"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
+  <div id="loginView" style="display:none;">
+    <div class="d-flex justify-content-center align-items-center" style="min-height:100vh;">
+      <div class="card p-4 shadow" style="width:100%;max-width:400px;">
+        <h2 class="mb-4 text-center">Login</h2>
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="loginEmail" required placeholder="Enter email">
+          </div>
+          <div class="mb-3">
+            <label for="loginPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="loginPassword" required placeholder="Password">
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/scripts.js"></script>
 </body>
 </html>
