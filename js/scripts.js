@@ -1,8 +1,9 @@
-document.getElementById('toggleBtn').addEventListener('click', function() {
-  document.getElementById('sidebar').classList.toggle('show');
+const API_BASE_URL = 'http://localhost:3000';
+
+document.getElementById('toggleBtn')?.addEventListener('click', function() {
+  document.getElementById('sidebar')?.classList.toggle('show');
 });
 
-// --- Navigation Logic ---
 const productsTableView = document.getElementById('productsTableView');
 const addProductView = document.getElementById('addProductView');
 const addProductBtn = document.getElementById('addProductBtn');
@@ -13,6 +14,85 @@ const navVariants = document.getElementById('nav-variants');
 const variantsTableView = document.getElementById('variantsTableView');
 const productDetailView = document.getElementById('productDetailView');
 const backToProductsBtn = document.getElementById('backToProductsBtn');
+const productsTableBody = document.getElementById('productsTableBody');
+
+async function fetchProducts() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch products');
+    }
+    const data = await response.json();
+    return data.products || [];
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    alert('Failed to load products. Please try again later.');
+    return [];
+  }
+}
+
+async function renderProducts() {
+  const products = await fetchProducts();
+  if (!productsTableBody) return;
+
+  // Clear existing rows
+  productsTableBody.innerHTML = '';
+
+  if (products.length === 0) {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td colspan="7" class="text-center py-4">No products found</td>
+    `;
+    productsTableBody.appendChild(row);
+    return;
+  }
+
+  // Add product rows
+  products.forEach(product => {
+    const row = document.createElement('tr');
+    const variant = product.variants && product.variants.length > 0 ? product.variants[0] : {};
+    const imageUrl = variant.images && variant.images.length > 0 ? variant.images[0] : 'https://via.placeholder.com/50';
+    
+    row.dataset.productId = product.id;
+    row.innerHTML = `
+      <td>
+        <div class="product-cell">
+          <img src="${imageUrl}" alt="${product.name}" class="product-img" onerror="this.src='https://via.placeholder.com/50'">
+          <div class="product-info">
+            <div class="product-name">${product.name}</div>
+            <div class="product-sku text-muted small">#${variant.sku || 'N/A'}</div>
+          </div>
+        </div>
+      </td>
+      <td>${product.brand || 'N/A'}</td>
+      <td>${product.type || 'N/A'}</td>
+      <td>$${parseFloat(product.base_price || 0).toFixed(2)}</td>
+      <td>
+        <div class="stock-status">
+          <span class="status-badge ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}">
+            ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+          </span>
+          <span>${product.stock || 0} units</span>
+        </div>
+      </td>
+      <td>${product.gender || 'Unisex'}</td>
+      <td>
+        <div class="dropdown">
+          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item view-product" href="#"><i class="bi bi-eye me-2"></i>View</a></li>
+            <li><a class="dropdown-item edit-product" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger delete-product" href="#"><i class="bi bi-trash me-2"></i>Delete</a></li>
+          </ul>
+        </div>
+      </td>
+    `;
+    productsTableBody.appendChild(row);
+  });
+}
 
 function showProductsTable() {
   productsTableView.style.display = '';
@@ -58,13 +138,23 @@ if (navProducts) {
 if (navVariants) {
   navVariants.addEventListener('click', showVariantsTable);
 }
-// Show table by default
-showProductsTable();
+// Initialize the page
+function init() {
+  // Show table by default
+  showProductsTable();
+  
+  // Load products from API
+  renderProducts();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  init();
+  renderProducts(); // Load products when the page loads
+});
 
 // Store current product ID when editing
 let currentProductId = null;
 
-// Function to load product data into the form for editing
 function loadProductForEdit(productData) {
   currentProductId = productData.id;
   // Show the form
@@ -118,10 +208,8 @@ function loadProductForEdit(productData) {
   }
 }
 
-// --- Products Table Actions ---
-const productsTableBody = document.getElementById('productsTableBody');
-productsTableBody.addEventListener('click', function(e) {
-  // Handle dropdown menu item clicks
+if (productsTableBody) {
+  productsTableBody.addEventListener('click', function(e) {
   const dropdownItem = e.target.closest('.dropdown-item');
   if (dropdownItem) {
     e.preventDefault();
@@ -175,14 +263,15 @@ productsTableBody.addEventListener('click', function(e) {
       return;
     }
   }
-  
-  // Handle direct button clicks (if any)
+  handleDirectButtonClicks(e);
+});
+
+function handleDirectButtonClicks(e) {
   if (e.target.closest('.btn-outline-info')) {
     const row = e.target.closest('tr');
     const productName = row.querySelector('.product-name').textContent;
     alert(`Viewing details for: ${productName}`);
   } else if (e.target.closest('.btn-outline-warning')) {
-    // This handles the edit button if it's not in a dropdown
     const row = e.target.closest('tr');
     const productData = {
       id: row.dataset.productId || '1',
@@ -203,9 +292,7 @@ productsTableBody.addEventListener('click', function(e) {
   } else if (e.target.closest('.btn-outline-danger')) {
     if (confirm('Are you sure you want to delete this product?')) {
       const row = e.target.closest('tr');
-      // In a real app, you would make an API call to delete the product
       row.remove();
-      // Reset form if the deleted product was being edited
       if (currentProductId === row.dataset.productId) {
         currentProductId = null;
         productForm.reset();
@@ -214,7 +301,7 @@ productsTableBody.addEventListener('click', function(e) {
       }
     }
   }
-});
+}
 
 // Dynamic Variants Logic
 let variantIndex = 0;
@@ -268,79 +355,132 @@ if (variantsContainer) {
 // Form submission: build FormData to match required structure
 const productForm = document.getElementById('productForm');
 if (productForm) {
-  productForm.addEventListener('submit', function(e) {
+  productForm.addEventListener('submit', async function(e) {
     e.preventDefault();
+    
+    // Prepare form data with proper structure
     const formData = new FormData();
+    
+    // Set default product type
+    const productType = 'Shoe';
+    
+    // Debug: Log all form elements
+    console.log('Form elements:', Array.from(productForm.elements).map(el => ({
+      name: el.name,
+      value: el.value,
+      type: el.type
+    })));
 
-    // Add product fields
-    ['name','type','base_price','description','brand','gender','category_id'].forEach(field => {
-      const input = productForm.querySelector(`[name="product[${field}]"]`);
-      if (input) formData.append(`product[${field}]`, input.value);
-    });
+    // Helper function to safely get form field value
+    const getFormValue = (fieldName) => {
+      const element = productForm.querySelector(`[name="${fieldName}"]`);
+      if (!element) {
+        console.error(`Form field not found: ${fieldName}`);
+        return null;
+      }
+      return element.value;
+    };
 
-    // Add variants
+    // Prepare product data object with null checks and default values
+    const productData = {
+      product: {
+        name: getFormValue('product[name]'),
+        type: productType, // Set default type to 'Shoe'
+        base_price: parseFloat(getFormValue('product[base_price]') || 0),
+        description: getFormValue('product[description]'),
+        brand: getFormValue('product[brand]'),
+        gender: getFormValue('product[gender]'),
+        category_id: parseInt(getFormValue('product[category_id]') || 0),
+        variants_attributes: []
+      }
+    };
+    
+    console.log('Prepared product data:', productData);
+
+    // Process variant rows
     const variantRows = variantsContainer.querySelectorAll('.variant-row');
-    variantRows.forEach((row, idx) => {
-      const sku = row.querySelector(`[name^="product[variants_attributes]["][sku]"]`).value;
-      const color = row.querySelector(`[name^="product[variants_attributes]["][color]"]`).value;
-      const size = row.querySelector(`[name^="product[variants_attributes]["][size]"]`).value;
-      formData.append(`product[variants_attributes][][sku]`, sku);
-      formData.append(`product[variants_attributes][][color]`, color);
-      formData.append(`product[variants_attributes][][size]`, size);
-
-      // Images
-      const imagesInput = row.querySelector('input[type="file"]');
-      if (imagesInput && imagesInput.files.length > 0) {
-        for (let i = 0; i < imagesInput.files.length; i++) {
-          formData.append(`variant_images[${sku}][]`, imagesInput.files[i]);
-        }
+    variantRows.forEach(row => {
+      const variant = {
+        sku: row.querySelector('[name$="[sku]"]').value,
+        color: row.querySelector('[name$="[color]"]').value,
+        size: row.querySelector('[name$="[size]"]').value,
+        variant_stock: row.querySelector('[name$="[stock]"]')?.value || '0'
+      };
+      
+      // Include variant ID if editing
+      const variantId = row.dataset.variantId;
+      if (variantId) {
+        variant.id = variantId;
+      }
+      
+      productData.product.variants_attributes.push(variant);
+      
+      // Handle file uploads
+      const fileInput = row.querySelector('input[type="file"]');
+      if (fileInput?.files.length > 0) {
+        Array.from(fileInput.files).forEach(file => {
+          formData.append(`variant_images[${variant.sku}][]`, file);
+        });
       }
     });
-
-    // Debug: log keys and values
-    // for (let pair of formData.entries()) {
-    //   console.log(pair[0]+ ':', pair[1]);
-    // }
-
+    
+    // Add product data as JSON string
+    formData.append('product', JSON.stringify(productData.product));
+    
     // Add product ID if editing
     if (currentProductId) {
-      formData.append('product[id]', currentProductId);
+      formData.append('id', currentProductId);
     }
-
+    
     // Determine the API endpoint and method
     const method = currentProductId ? 'PATCH' : 'POST';
     const endpoint = currentProductId 
-      ? `/api/products/${currentProductId}.json` 
-      : '/api/products.json';
-
+      ? `${API_BASE_URL}/products/${currentProductId}.json` 
+      : `${API_BASE_URL}/products.json`;
+    
+    // Log form data before sending
+    console.log('Form data being sent:', Object.fromEntries(formData.entries()));
+    console.log('Sending', method, 'request to:', endpoint);
+    
     // Submit form data
     fetch(endpoint, { 
       method: method,
-      body: formData,
-      // In a real app, you would include authentication headers
-      // headers: {
-      //   'X-CSRF-Token': document.querySelector('[name="csrf-token"]').content
-      // }
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''
+      },
+      credentials: 'include',
+      body: formData
     })
     .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
+      console.log('Response status:', response.status, response.statusText);
+      if (!response.ok) {
+        return response.text().then(text => {
+          console.error('Error response:', text);
+          throw new Error(`HTTP error! status: ${response.status}`);
+        });
+      }
       return response.json();
     })
     .then(data => {
-      // Show success message
+      console.log('Success:', data);
       alert(`Product ${currentProductId ? 'updated' : 'created'} successfully!`);
-      // Refresh the products list
       showProductsTable();
+      
+      // Reset form if it was a creation
+      if (!currentProductId) {
+        productForm.reset();
+        variantsContainer.innerHTML = ''; // Clear variants
+      }
     })
     .catch(error => {
       console.error('Error:', error);
-      alert(`Error ${currentProductId ? 'updating' : 'creating'} product. Please try again.`);
+      alert(`Error ${currentProductId ? 'updating' : 'creating'} product: ${error.message}`);
     });
   });
 }
 
-// --- Variants Table Actions ---
-const variantsTableBody = document.getElementById('variantsTableBody');
+// ... (rest of the code remains the same)
 if (variantsTableBody) {
   variantsTableBody.addEventListener('click', function(e) {
     const dropdownItem = e.target.closest('.dropdown-item');
@@ -392,7 +532,6 @@ if (variantsTableBody) {
     }
   });
 }
-// Helper to convert rgb/rgba to hex
 function rgbToHex(rgb) {
   if (!rgb) return '#000000';
   const result = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
@@ -518,6 +657,7 @@ function showProductDetail(productData) {
     });
     selector.appendChild(vDiv);
   });
+}
 }
 if (backToProductsBtn) {
   backToProductsBtn.addEventListener('click', function() {
