@@ -4,7 +4,7 @@ This is a frontend dashboard application built using plain HTML, CSS, and JavaSc
 
 ## Purpose
 
-This dashboard provides a user interface for managing and visualizing data from the Chama application. It includes features for data visualization, user management, and system monitoring.
+This dashboard provides a user interface for managing and visualizing data from the Chama application. It includes features for adding products, variants, and related CRUD operations.
 
 ## Backend Requirement
 
